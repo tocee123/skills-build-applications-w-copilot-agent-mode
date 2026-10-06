@@ -16,13 +16,15 @@ const baseUrl = codespaceName
 
 app.use(express.json());
 
-async function registerResourceRoutes(resourcePath: string, model: Model<any>) {
-  app.get(resourcePath, async (_request, response) => {
+function createResourceRouter(model: Model<any>) {
+  const router = express.Router();
+
+  router.get('/', async (_request, response) => {
     const items = await model.find({});
     response.json(items);
   });
 
-  app.get(`${resourcePath}:id`, async (request, response) => {
+  router.get('/:id', async (request, response) => {
     const item = await model.findById(request.params.id);
 
     if (!item) {
@@ -32,6 +34,8 @@ async function registerResourceRoutes(resourcePath: string, model: Model<any>) {
 
     response.json(item);
   });
+
+  return router;
 }
 
 app.get('/api/health', async (_request, response) => {
@@ -56,11 +60,11 @@ app.get('/api/health', async (_request, response) => {
   });
 });
 
-registerResourceRoutes('/api/users/', User);
-registerResourceRoutes('/api/teams/', Team);
-registerResourceRoutes('/api/activities/', Activity);
-registerResourceRoutes('/api/leaderboard/', Leaderboard);
-registerResourceRoutes('/api/workouts/', Workout);
+app.use('/api/users/', createResourceRouter(User));
+app.use('/api/teams/', createResourceRouter(Team));
+app.use('/api/activities/', createResourceRouter(Activity));
+app.use('/api/leaderboard/', createResourceRouter(Leaderboard));
+app.use('/api/workouts/', createResourceRouter(Workout));
 
 void connectDatabase().catch((error) => {
   console.error('Failed to connect to MongoDB on startup:', error);
