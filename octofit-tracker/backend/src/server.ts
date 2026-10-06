@@ -13,6 +13,28 @@ const codespaceName = process.env.CODESPACE_NAME;
 const baseUrl = codespaceName
   ? `https://${codespaceName}-8000.app.github.dev`
   : 'http://localhost:8000' ;
+const frontendOrigins = new Set([
+  'http://localhost:5173',
+  ...(codespaceName ? [`https://${codespaceName}-5173.app.github.dev`] : []),
+]);
+
+app.use((request, response, next) => {
+  const origin = request.get('origin');
+
+  if (origin && frontendOrigins.has(origin)) {
+    response.setHeader('Access-Control-Allow-Origin', origin);
+    response.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    response.setHeader('Vary', 'Origin');
+  }
+
+  if (request.method === 'OPTIONS') {
+    response.sendStatus(204);
+    return;
+  }
+
+  next();
+});
 
 app.use(express.json());
 

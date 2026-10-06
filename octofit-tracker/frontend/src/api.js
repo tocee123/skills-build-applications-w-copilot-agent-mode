@@ -4,10 +4,26 @@ const apiBase = import.meta.env.VITE_CODESPACE_NAME
 
 export { apiBase };
 
-export const endpoints = {
-  activities: `${apiBase}/api/activities/`,
-  leaderboard: `${apiBase}/api/leaderboard/`,
-  teams: `${apiBase}/api/teams/`,
-  users: `${apiBase}/api/users/`,
-  workouts: `${apiBase}/api/workouts/`,
-};
+export function normalizeCollection(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (payload && typeof payload === 'object') {
+    const candidates = [
+      payload.results,
+      payload.items,
+      payload.data,
+      payload.data?.results,
+      payload.data?.items,
+      payload.data?.data,
+    ];
+    const collection = candidates.find(Array.isArray);
+
+    if (collection) {
+      return collection;
+    }
+  }
+
+  throw new Error('Expected an array or paginated collection response.');
+}

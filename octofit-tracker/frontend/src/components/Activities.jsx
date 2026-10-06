@@ -1,37 +1,34 @@
 import { useEffect, useState } from 'react';
-import { endpoints } from '../api';
-
-function normalizeCollection(data) {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.results)) return data.results;
-  if (Array.isArray(data?.items)) return data.items;
-  if (Array.isArray(data?.data)) return data.data;
-  return [];
-}
+import { apiBase, normalizeCollection } from '../api';
 
 export default function Activities() {
   const [items, setItems] = useState([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(endpoints.activities)
+    fetch(`${apiBase}/api/activities/`)
       .then((response) => {
         if (!response.ok) {
           throw new Error(`Request failed with status ${response.status}`);
         }
         return response.json();
       })
-      .then((data) => setItems(normalizeCollection(data)))
+      .then(normalizeCollection)
+      .then(setItems)
       .catch((err) => {
         console.error('Failed to load activities:', err);
         setError('Unable to load activities right now.');
-      });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   return (
     <section>
       <h2 className="h4 mb-3">Activities</h2>
       {error ? <div className="alert alert-danger">{error}</div> : null}
+      {loading ? <p className="text-body-secondary">Loading activities...</p> : null}
+      {!loading && !error && items.length === 0 ? <p className="text-body-secondary">No activities recorded yet.</p> : null}
       <div className="row g-3">
         {items.map((item) => (
           <div key={item._id || item.id} className="col-md-6 col-xl-4">

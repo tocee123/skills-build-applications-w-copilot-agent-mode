@@ -1,4 +1,4 @@
-import { NavLink, Route, Routes } from 'react-router-dom'
+import { Link, NavLink, Route, Routes } from 'react-router-dom'
 import Activities from './components/Activities'
 import Leaderboard from './components/Leaderboard'
 import Teams from './components/Teams'
@@ -7,49 +7,27 @@ import Workouts from './components/Workouts'
 
 const sections = [
   { path: '/', label: 'Overview' },
-  { path: '/activities', label: 'Activities' },
-  { path: '/teams', label: 'Teams' },
-  { path: '/leaderboard', label: 'Leaderboard' },
-  { path: '/users', label: 'Users' },
-  { path: '/workouts', label: 'Workouts' },
+  { path: '/activities', label: 'Activities', description: 'Track workouts, runs, and recovery sessions.' },
+  { path: '/teams', label: 'Teams', description: 'Create groups and encourage shared progress.' },
+  { path: '/leaderboard', label: 'Leaderboard', description: 'See top performers in each challenge.' },
+  { path: '/users', label: 'Users', description: 'Meet members and view fitness profiles.' },
+  { path: '/workouts', label: 'Workouts', description: 'Explore plans for every training level.' },
 ]
 
 function Overview() {
   return (
     <section>
       <div className="row g-4">
-        <div className="col-md-6 col-xl-3">
-          <div className="card h-100 border-0 shadow-sm">
-            <div className="card-body">
-              <h2 className="h5">Activity</h2>
-              <p className="mb-0 text-body-secondary">Track every workout, run, and recovery session.</p>
-            </div>
+        {sections.slice(1).map(({ path, label, description }) => (
+          <div className="col-md-6 col-xl-4" key={path}>
+            <Link to={path} className="card h-100 border-0 shadow-sm text-decoration-none text-reset">
+              <div className="card-body">
+                <h2 className="h5">{label}</h2>
+                <p className="mb-0 text-body-secondary">{description}</p>
+              </div>
+            </Link>
           </div>
-        </div>
-        <div className="col-md-6 col-xl-3">
-          <div className="card h-100 border-0 shadow-sm">
-            <div className="card-body">
-              <h2 className="h5">Teams</h2>
-              <p className="mb-0 text-body-secondary">Create groups and encourage shared progress.</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-6 col-xl-3">
-          <div className="card h-100 border-0 shadow-sm">
-            <div className="card-body">
-              <h2 className="h5">Leaderboard</h2>
-              <p className="mb-0 text-body-secondary">Spot the top performers in each challenge.</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-6 col-xl-3">
-          <div className="card h-100 border-0 shadow-sm">
-            <div className="card-body">
-              <h2 className="h5">Workouts</h2>
-              <p className="mb-0 text-body-secondary">Personalized plans for every training level.</p>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </section>
   )
